@@ -25,6 +25,8 @@ functions:
     handler: src/lambda/http/getTodos.handler
     events:
       - http:
+          authorizer: Auth
+          cors: true
           method: get
           path: todos
 
