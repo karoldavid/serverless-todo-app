@@ -21,11 +21,15 @@ custom:
     httpPort: 3003
     allowCache: true
     useChildProcesses: true
+  stage: ${opt:stage, self:provider.stage}
+  apiEndpoint:
+    dev: https://dev-wtkb-285.eu.auth0.com/.well-known/jwks.json
 
 functions:
-
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
+    environment: 
+      AUTH_0_JWKS_URL: ${self:custom.apiEndpoint.${self:custom.stage}}
 
   # TODO: Configure this function
   GetTodos:
@@ -44,7 +48,6 @@ functions:
   #     - http:
   #         method: post
   #         path: todos
-
   # # TODO: Configure this function
   # UpdateTodo:
   #   handler: src/lambda/http/updateTodo.handler
@@ -52,7 +55,6 @@ functions:
   #     - http:
   #         method: patch
   #         path: todos/{todoId}
-
   # # TODO: Configure this function
   # DeleteTodo:
   #   handler: src/lambda/http/deleteTodo.handler
@@ -60,7 +62,6 @@ functions:
   #     - http:
   #         method: delete
   #         path: todos/{todoId}
-
   # # TODO: Configure this function
   # GenerateUploadUrl:
   #   handler: src/lambda/http/generateUploadUrl.handler
