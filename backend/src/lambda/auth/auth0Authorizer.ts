@@ -88,8 +88,6 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
       algorithms: ['RS256']
     })
 
-    console.log(result)
-
     return jwt.payload
   } catch (error) {
     throw error
@@ -107,3 +105,4 @@ export function getToken(authHeader: string): string {
 
   return token
 }
+ 
