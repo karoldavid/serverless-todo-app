@@ -16,6 +16,15 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
 
+  environment:
+    TODOS_TABLE: Todos-${self:provider.stage}
+  
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Scan
+      Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
+
 custom:
   serverless-offline:
     httpPort: 3003
@@ -28,7 +37,7 @@ custom:
 functions:
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
-    environment: 
+    environment:
       AUTH_0_JWKS_URL: ${self:custom.apiEndpoint.${self:custom.stage}}
 
   # TODO: Configure this function
@@ -36,10 +45,10 @@ functions:
     handler: src/lambda/http/getTodos.handler
     events:
       - http:
-          authorizer: Auth
-          cors: true
           method: get
           path: todos
+          cors: true
+          authorizer: Auth
 
   # # TODO: Configure this function
   # CreateTodo:
@@ -70,6 +79,17 @@ functions:
   #         method: post
   #         path: todos/{todoId}/attachment
 
+# TODO: Add any necessary AWS resources
 resources:
   Resources:
-    # TODO: Add any necessary AWS resources
+    GroupsDynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${self:provider.environment.TODOS_TABLE}
