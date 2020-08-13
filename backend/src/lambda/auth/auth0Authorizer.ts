@@ -84,7 +84,7 @@ async function verifyToken(authHeader: string): Promise<JwtPayload> {
   const signingKey = signingKeys.find((key) => key.kid === kid)
 
   try {
-    const result = verify(token, signingKey.publicKey, {
+    verify(token, signingKey.publicKey, {
       algorithms: ['RS256']
     })
 
@@ -105,4 +105,3 @@ export function getToken(authHeader: string): string {
 
   return token
 }
- 

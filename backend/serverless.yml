@@ -82,7 +82,7 @@ functions:
 # TODO: Add any necessary AWS resources
 resources:
   Resources:
-    GroupsDynamoDBTable:
+    TodosDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
