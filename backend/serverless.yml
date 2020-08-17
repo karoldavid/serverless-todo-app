@@ -8,6 +8,7 @@ plugins:
   - serverless-webpack
   - serverless-iam-roles-per-function
   - serverless-offline
+  - serverless-dynamodb-local
 
 provider:
   name: aws
@@ -33,6 +34,14 @@ custom:
   stage: ${opt:stage, self:provider.stage}
   apiEndpoint:
     dev: https://dev-wtkb-285.eu.auth0.com/.well-known/jwks.json
+  
+  dynamodb:
+    start:
+      port: 8002
+      inMemory: true
+      migrate: true
+    stages:
+      - ${opt:stage, self:provider.stage}
 
 functions:
   Auth:
@@ -82,7 +91,7 @@ functions:
 # TODO: Add any necessary AWS resources
 resources:
   Resources:
-    TodosDynamoDBTable:
+    GroupsDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
         AttributeDefinitions:
