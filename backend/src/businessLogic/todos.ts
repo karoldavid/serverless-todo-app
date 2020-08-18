@@ -1,28 +1,13 @@
-import { APIGatewayProxyEvent } from 'aws-lambda'
-import * as AWS from 'aws-sdk'
+import { TodoItem } from '../models/TodoItem'
+import { TodoAccess } from '../dataLayer/todoAccess'
 import { createLogger } from '../utils/logger'
 
-const logger = createLogger('getAllTodos')
+const logger = createLogger('todos')
 
-import { getUserId } from '../lambda/utils'
 
-// Serverless Framework Lesson 3: Port Get All Groups Demo
-const docClient = new AWS.DynamoDB.DocumentClient()
-const todosTable = process.env.TODOS_TABLE
+const todoAccess = new TodoAccess()
 
-// FIXME: remove mock
-export async function getAllTodos(event: APIGatewayProxyEvent) {
-  const result = await docClient
-    .scan({
-      TableName: todosTable
-    })
-    .promise()
-
-  const userId = getUserId(event)
-
-  logger.info('get todos from dynamoDB success', userId)
-
-  const items = result.Items
-
-  return items
+export async function getAllTodos(): Promise<TodoItem[]> {
+  logger.info('Getting all todos')
+  return todoAccess.getAllTodos()
 }

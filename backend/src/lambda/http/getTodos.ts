@@ -17,7 +17,7 @@ export const handler: APIGatewayProxyHandler = async (
   logger.info('event', event)
 
   // TODO: Get all TODO items for a current user
-  const items = await getAllTodos(event)
+  const items = await getAllTodos()
 
   return {
     statusCode: 200,
