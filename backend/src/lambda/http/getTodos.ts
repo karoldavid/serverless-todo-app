@@ -27,3 +27,4 @@ export const handler: APIGatewayProxyHandler = async (
     body: JSON.stringify({ items })
   }
 }
+
