@@ -11,5 +11,11 @@ export const handler: APIGatewayProxyHandler = async (event: APIGatewayProxyEven
   console.log(todoId, updatedTodo)
 
   // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-  return undefined
+  return {
+    statusCode: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
+    body: JSON.stringify({ todoId })
+  }
 }
