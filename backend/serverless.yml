@@ -26,6 +26,7 @@ provider:
         - dynamodb:Scan
         - dynamodb:PutItem
         - dynamodb:GetItem
+        - dynamodb:UpdateItem
       Resource: arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.TODOS_TABLE}
 
 custom:
@@ -83,7 +84,7 @@ functions:
       - http:
           method: put
           path: todos/{todoId}
-          cors: CreateTodoRequest
+          cors: true
           authorizer: Auth
           documentation:
             summary: Update a todo item
