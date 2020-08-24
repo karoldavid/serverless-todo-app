@@ -2,8 +2,10 @@ import { APIGatewayProxyEvent } from 'aws-lambda'
 // import * as AWS from 'aws-sdk'
 import * as uuid from 'uuid'
 import { TodoItem } from '../models/TodoItem'
+import { TodoUpdate } from '../models/TodoUpdate'
 import { TodoAccess } from '../dataLayer/todoAccess'
 import { CreateTodoRequest } from '../requests/CreateTodoRequest'
+import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import { getUserId } from '../lambda/utils'
 
@@ -23,7 +25,7 @@ export async function createTodo(
   const itemId = uuid.v4()
   const userId = getUserId(event)
 
-  logger.info('Creating todo for user: ', userId)
+  logger.info('Creating todo.', itemId, userId)
 
   return await todoAccess.createTodo({
     userId: userId,
@@ -31,6 +33,18 @@ export async function createTodo(
     createdAt: new Date().toISOString(),
     name: createTodoRequest.name,
     dueDate: createTodoRequest.dueDate,
-    done: false,
+    done: false
   })
+}
+
+export async function updateTodo(
+  itemId: string,
+  updateTodo: UpdateTodoRequest,
+  event: APIGatewayProxyEvent
+): Promise<TodoUpdate> {
+  const userId = getUserId(event)
+
+  logger.info('Updating todo.', itemId, userId)
+
+  return await todoAccess.updateTodo(userId, itemId, updateTodo)
 }

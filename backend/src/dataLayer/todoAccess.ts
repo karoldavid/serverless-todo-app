@@ -2,6 +2,7 @@ import * as AWS from 'aws-sdk'
 import { DocumentClient } from 'aws-sdk/clients/dynamodb'
 import { createLogger } from '../utils/logger'
 import { TodoItem } from '../models/TodoItem'
+import { TodoUpdate } from '../models/TodoUpdate'
 
 const logger = createLogger('todoAccess')
 
@@ -35,6 +36,46 @@ export class TodoAccess {
       .promise()
 
     return todo
+  }
+
+  async updateTodo(
+    userId: string,
+    todoId: string,
+    todoUpdate: TodoUpdate
+  ): Promise<TodoUpdate> {
+    var params = {
+      TableName: this.todosTable,
+      Key: {
+        userId: userId,
+        todoId: todoId
+      },
+      UpdateExpression: 'set #name = :name, #dueDate = :dueDate, #done = :done',
+      ExpressionAttributeValues: {
+        ':name': todoUpdate.name,
+        ':dueDate': todoUpdate.dueDate,
+        ':done': todoUpdate.done
+      },
+      ExpressionAttributeNames: {
+        '#name': 'name',
+        '#dueDate': 'dueDate',
+        '#done': 'done'
+      },
+      ReturnValues: 'UPDATED_NEW'
+    }
+
+    logger.info('Updating todo item.')
+
+    try {
+      await this.docClient.update(params).promise()
+
+      logger.info('Update todo item succeeded.')
+
+      return todoUpdate
+    } catch (err) {
+      logger.info('Unable to update item. Error JSON:', err)
+
+      throw new Error(err)
+    }
   }
 }
 
