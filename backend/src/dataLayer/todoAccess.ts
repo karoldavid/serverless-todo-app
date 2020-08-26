@@ -77,6 +77,25 @@ export class TodoAccess {
       throw new Error(err)
     }
   }
+
+  async deleteTodo(todoId: string, userId: string): Promise<string> {
+    const params = {
+      TableName: this.todosTable,
+      Key: {
+        userId: userId,
+        todoId: todoId
+      },
+    }
+    try {
+      await this.docClient.delete(params).promise()
+
+      return todoId
+    } catch (err) {
+      logger.info('Unable to delete item. Error JSON:', err)
+
+      throw new Error(err)
+    }
+  }
 }
 
 function createDynamoDBClient() {

@@ -48,3 +48,14 @@ export async function updateTodo(
 
   return await todoAccess.updateTodo(userId, itemId, updateTodo)
 }
+
+export async function deleteTodo(
+  todoId: string,
+  event: APIGatewayProxyEvent
+): Promise<string> {
+  const userId = getUserId(event)
+
+  logger.info('Deleting todo.', todoId, userId)
+
+  return await todoAccess.deleteTodo(todoId, userId)
+}
