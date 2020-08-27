@@ -59,3 +59,13 @@ export async function deleteTodo(
 
   return await todoAccess.deleteTodo(todoId, userId)
 }
+
+export async function todoExists(
+  todoId: string,
+  event: APIGatewayProxyEvent
+): Promise<boolean> {
+  const userId = getUserId(event)
+  logger.info('Checking if todo exists.', todoId, userId)
+
+  return await todoAccess.todoExists(todoId, userId)
+}

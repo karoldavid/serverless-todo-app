@@ -84,7 +84,7 @@ export class TodoAccess {
       Key: {
         userId: userId,
         todoId: todoId
-      },
+      }
     }
     try {
       await this.docClient.delete(params).promise()
@@ -95,6 +95,20 @@ export class TodoAccess {
 
       throw new Error(err)
     }
+  }
+  async todoExists(todoId: string, userId: string): Promise<boolean> {
+    const result = await this.docClient
+      .get({
+        TableName: this.todosTable,
+        Key: {
+          userId: userId,
+          todoId: todoId,
+        }
+      })
+      .promise()
+
+    logger.info('Get todo: ', result)
+    return !!result.Item
   }
 }
 
