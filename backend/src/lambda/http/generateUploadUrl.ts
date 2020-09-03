@@ -4,10 +4,23 @@ import {
   APIGatewayProxyResult,
   APIGatewayProxyHandler
 } from 'aws-lambda'
-import { todoExists} from '../../businessLogic/todos'
+import * as AWS  from 'aws-sdk'
+import * as uuid from 'uuid'
+import { todoExists, getTodo } from '../../businessLogic/todos'
 import { createLogger } from '../../utils/logger'
+import { TodoItem } from '../../models/TodoItem'
+import { getUserId } from '../../lambda/utils'
 
 const logger = createLogger('generateUploadUrl')
+
+const bucketName = process.env.IMAGES_S3_BUCKET
+const urlExpiration = process.env.SIGNED_URL_EXPIRATION
+const imagesTable = process.env.IMAGES_TABLE
+
+const docClient = new AWS.DynamoDB.DocumentClient()
+const s3 = new AWS.S3({
+  signatureVersion: 'v4'
+})
 
 export const handler: APIGatewayProxyHandler = async (
   event: APIGatewayProxyEvent
@@ -27,13 +40,57 @@ export const handler: APIGatewayProxyHandler = async (
     }
   }
 
+  const todo = await getTodo(todoId, event)
+
   // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+  const imageId = uuid.v4()
+  const newItem = await createImage(todoId, imageId, todo, event)
+
+  const url = getUploadUrl(imageId)
+
   return {
-    statusCode: 200,
+    statusCode: 201,
     body: JSON.stringify({
-      todoId,
-      validTodoId: validTodoId,
-      url: 'image upload url',
+      newItem: newItem,
+      uploadUrl: url
     })
   }
+}
+
+async function createImage(
+  todoId: string,
+  imageId: string,
+  todo: TodoItem,
+  event: APIGatewayProxyEvent
+) {
+  const timestamp = new Date().toISOString()
+  // const newImage = JSON.parse(event.body)
+  const userId = getUserId(event)
+
+  const newItem = {
+    userId,
+    todoId,
+    timestamp,
+    imageId,
+    ...todo,
+    imageUrl: `https://${bucketName}.s3.amazonaws.com/${imageId}`
+  }
+  console.log('Storing new item: ', newItem)
+
+  await docClient
+    .put({
+      TableName: imagesTable,
+      Item: newItem
+    })
+    .promise()
+
+  return newItem
+}
+
+function getUploadUrl(imageId: string) {
+  return s3.getSignedUrl('putObject', {
+    Bucket: bucketName,
+    Key: imageId,
+    Expires: urlExpiration
+  })
 }

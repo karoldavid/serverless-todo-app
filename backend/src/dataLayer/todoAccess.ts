@@ -96,19 +96,43 @@ export class TodoAccess {
       throw new Error(err)
     }
   }
+
   async todoExists(todoId: string, userId: string): Promise<boolean> {
     const result = await this.docClient
       .get({
         TableName: this.todosTable,
         Key: {
           userId: userId,
-          todoId: todoId,
+          todoId: todoId
         }
       })
       .promise()
 
     logger.info('Get todo: ', result)
     return !!result.Item
+  }
+
+  async getTodo(todoId: string, userId: string): Promise<TodoItem> {
+    const result = await this.docClient
+      .get({
+        TableName: this.todosTable,
+        Key: {
+          userId: userId,
+          todoId: todoId
+        }
+      })
+      .promise()
+
+    logger.info('Get todo: ', result.Item)
+
+    return {
+      userId: userId,
+      todoId: todoId,
+      name: result.Item.name,
+      dueDate: result.Item.dueDate,
+      done: result.Item.done,
+      createdAt: result.Item.createdAt
+    }
   }
 }
 

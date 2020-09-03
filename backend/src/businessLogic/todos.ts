@@ -69,3 +69,13 @@ export async function todoExists(
 
   return await todoAccess.todoExists(todoId, userId)
 }
+
+export async function getTodo(
+  todoId: string,
+  event: APIGatewayProxyEvent
+): Promise<TodoItem> {
+  const userId = getUserId(event)
+  logger.info('Getting todo', todoId, userId)
+
+  return await todoAccess.getTodo(todoId, userId)
+}
