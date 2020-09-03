@@ -16,16 +16,23 @@ export const handler: APIGatewayProxyHandler = async (
 
   logger.info('Generate upload url for todo:', todoId)
 
-  const result = await todoExists(todoId, event)
+  const validTodoId = await todoExists(todoId, event)
 
-  logger.info('Todo exists:', result)
+  if (!validTodoId) {
+    return {
+      statusCode: 404,
+      body: JSON.stringify({
+        error: 'Todo does not exist'
+      })
+    }
+  }
 
   // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
   return {
     statusCode: 200,
     body: JSON.stringify({
       todoId,
-      todoExists: result,
+      validTodoId: validTodoId,
       url: 'image upload url',
     })
   }
