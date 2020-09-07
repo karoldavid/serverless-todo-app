@@ -71,7 +71,6 @@ functions:
     environment:
       AUTH_0_JWKS_URL: ${self:custom.apiEndpoint.${self:custom.stage}}
 
-  # TODO: Configure this function
   GetTodos:
     handler: src/lambda/http/getTodos.handler
     events:
@@ -81,7 +80,6 @@ functions:
           cors: true
           authorizer: Auth
 
-  # TODO: Configure this function
   CreateTodo:
     handler: src/lambda/http/createTodo.handler
     events:
@@ -96,7 +94,6 @@ functions:
             requestModels:
               'application/json': CreateTodoRequest
 
-  # # TODO: Configure this function
   UpdateTodo:
     handler: src/lambda/http/updateTodo.handler
     events:
@@ -111,7 +108,6 @@ functions:
             requestModels:
               'application/json': UpdateTodoRequest
 
-  # TODO: Configure this function
   DeleteTodo:
     handler: src/lambda/http/deleteTodo.handler
     events:
@@ -124,7 +120,6 @@ functions:
             summary: Delete a todo item
             description: Delete a todo item
 
-  # TODO: Configure this function
   GenerateUploadUrl:
     handler: src/lambda/http/generateUploadUrl.handler
     events:
@@ -137,7 +132,6 @@ functions:
             summary: Return a presigned URL
             description: Return a presigned URL to upload a file for a TODO item with the provided id
 
-# TODO: Add any necessary AWS resources
 resources:
   Resources:
     TodosDynamoDBTable:
