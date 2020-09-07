@@ -15,7 +15,6 @@ export const handler: APIGatewayProxyHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   const newTodo: CreateTodoRequest = JSON.parse(event.body)
 
-  // TODO: Implement creating a new TODO item
   const newItem = await createTodo(newTodo, event)
 
   logger.info('Created new todo item.')

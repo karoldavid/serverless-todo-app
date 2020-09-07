@@ -16,7 +16,6 @@ export const handler: APIGatewayProxyHandler = async (
 ): Promise<APIGatewayProxyResult> => {
   logger.info('event', event)
 
-  // TODO: Get all TODO items for a current user
   const items = await getAllTodos()
 
   return {

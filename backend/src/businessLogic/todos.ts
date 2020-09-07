@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent } from 'aws-lambda'
-// import * as AWS from 'aws-sdk'
 import * as uuid from 'uuid'
 import { TodoItem } from '../models/TodoItem'
 import { TodoUpdate } from '../models/TodoUpdate'
