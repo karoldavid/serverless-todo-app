@@ -12,9 +12,12 @@ const logger = createLogger('todos')
 
 const todoAccess = new TodoAccess()
 
-export async function getAllTodos(): Promise<TodoItem[]> {
+export async function getAllTodos(
+  event: APIGatewayProxyEvent
+): Promise<TodoItem[]> {
+  const userId = getUserId(event)
   logger.info('Getting all todos')
-  return todoAccess.getAllTodos()
+  return todoAccess.getAllTodos(userId)
 }
 
 export async function createTodo(
