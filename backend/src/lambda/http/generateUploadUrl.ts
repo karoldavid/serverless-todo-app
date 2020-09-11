@@ -42,9 +42,9 @@ export const handler: APIGatewayProxyHandler = async (
 
   const todo = await getTodo(todoId, event)
 
+  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
   const imageId = uuid.v4()
-  
-  await createImage(todoId, imageId, todo, event)
+  const newItem = await createImage(todoId, imageId, todo, event)
 
   const url = getUploadUrl(imageId)
 
@@ -55,7 +55,7 @@ export const handler: APIGatewayProxyHandler = async (
       'Access-Control-Allow-Credentials': true
     },
     body: JSON.stringify({
-
+      newItem: newItem,
       uploadUrl: url
     })
   }
@@ -68,6 +68,7 @@ async function createImage(
   event: APIGatewayProxyEvent
 ) {
   const timestamp = new Date().toISOString()
+  // const newImage = JSON.parse(event.body)
   const userId = getUserId(event)
 
   const newItem = {
@@ -78,6 +79,7 @@ async function createImage(
     ...todo,
     imageUrl: `https://${bucketName}.s3.amazonaws.com/${imageId}`
   }
+  console.log('Storing new item: ', newItem)
 
   await docClient
     .put({
