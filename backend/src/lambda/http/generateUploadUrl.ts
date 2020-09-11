@@ -1,9 +1,6 @@
 import 'source-map-support/register'
-import {
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-} from 'aws-lambda'
-import * as AWS  from 'aws-sdk'
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import * as AWS from 'aws-sdk'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 import * as uuid from 'uuid'
@@ -23,39 +20,40 @@ const s3 = new AWS.S3({
   signatureVersion: 'v4'
 })
 
-export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+export const handler = middy(
+  async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const todoId = event.pathParameters.todoId
 
-  const todoId = event.pathParameters.todoId
+    logger.info('Generate upload url for todo:', todoId)
 
-  logger.info('Generate upload url for todo:', todoId)
+    const validTodoId = await todoExists(todoId, event)
 
-  const validTodoId = await todoExists(todoId, event)
+    if (!validTodoId) {
+      return {
+        statusCode: 404,
+        body: JSON.stringify({
+          error: 'Todo does not exist'
+        })
+      }
+    }
 
-  if (!validTodoId) {
+    const todo = await getTodo(todoId, event)
+
+    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
+    const imageId = uuid.v4()
+
+    await createImage(todoId, imageId, todo, event)
+
+    const url = getUploadUrl(imageId)
+
     return {
-      statusCode: 404,
+      statusCode: 201,
       body: JSON.stringify({
-        error: 'Todo does not exist'
+        uploadUrl: url
       })
     }
   }
-
-  const todo = await getTodo(todoId, event)
-
-  // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-  const imageId = uuid.v4()
-  const newItem = await createImage(todoId, imageId, todo, event)
-
-  const url = getUploadUrl(imageId)
-
-  return {
-    statusCode: 201,
-    body: JSON.stringify({
-      newItem: newItem,
-      uploadUrl: url
-    })
-  }
-})
+)
 
 handler.use(
   cors({
