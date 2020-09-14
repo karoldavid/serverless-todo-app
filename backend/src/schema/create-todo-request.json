@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "CreateTodoRequest",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "dueDate": {
+      "type": "string"
+    },
+    "attachmentUrl": {
+      "type": "string"
+    }
+  },
+  "required": ["name", "dueDate"],
+  "additionalProperties": true
+}
