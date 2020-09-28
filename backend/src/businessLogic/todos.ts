@@ -8,6 +8,7 @@ import { UpdateTodoRequest } from '../requests/UpdateTodoRequest'
 import { createLogger } from '../utils/logger'
 import { getUserId } from '../lambda/utils'
 
+
 const logger = createLogger('todos')
 
 const todoAccess = new TodoAccess()
@@ -49,6 +50,14 @@ export async function updateTodo(
   logger.info('Updating todo.', itemId, userId)
 
   return await todoAccess.updateTodo(userId, itemId, updateTodo)
+}
+
+export async function updateTodoUrl(todo: TodoItem, attachmentUrl: string, event: APIGatewayProxyEvent): Promise<TodoItem> {
+  const userId = getUserId(event)
+
+  logger.info('Updating todo.', todo.todoId, userId)
+
+  return await todoAccess.updateTodoUrl(todo, attachmentUrl)
 }
 
 export async function deleteTodo(

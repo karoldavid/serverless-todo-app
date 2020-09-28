@@ -5,7 +5,7 @@ import * as AWSXRay from 'aws-xray-sdk'
 import * as middy from 'middy'
 import { cors } from 'middy/middlewares'
 import * as uuid from 'uuid'
-import { todoExists, getTodo } from '../../businessLogic/todos'
+import { todoExists, getTodo, updateTodoUrl } from '../../businessLogic/todos'
 import { createLogger } from '../../utils/logger'
 import { TodoItem } from '../../models/TodoItem'
 import { getUserId } from '../../lambda/utils'
@@ -50,6 +50,8 @@ export const handler = middy(
 
     const url = getUploadUrl(imageId)
 
+    await updateTodoUrl(todo, url, event)
+
     return {
       statusCode: 201,
       body: JSON.stringify({
@@ -78,10 +80,10 @@ async function createImage(
   const newItem = {
     userId,
     todoId,
-    timestamp,
     imageId,
+    timestamp,
     ...todo,
-    imageUrl: `https://${bucketName}.s3.amazonaws.com/${imageId}`
+    attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${todoId}`
   }
   console.log('Storing new item: ', newItem)
 
@@ -95,10 +97,10 @@ async function createImage(
   return newItem
 }
 
-function getUploadUrl(imageId: string) {
+function getUploadUrl(todoId: string) {
   return s3.getSignedUrl('putObject', {
     Bucket: bucketName,
-    Key: imageId,
+    Key: todoId,
     Expires: urlExpiration
   })
 }

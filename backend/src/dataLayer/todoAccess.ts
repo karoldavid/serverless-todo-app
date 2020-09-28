@@ -84,6 +84,20 @@ export class TodoAccess {
     }
   }
 
+  async updateTodoUrl(
+    todo: TodoItem,
+    attachmentUrl: string
+  ): Promise<TodoItem> {
+    await this.docClient
+      .put({
+        TableName: this.todosTable,
+        Item: { ...todo, attachmentUrl }
+      })
+      .promise()
+
+    return { ...todo, attachmentUrl }
+  }
+
   async deleteTodo(todoId: string, userId: string): Promise<string> {
     const params = {
       TableName: this.todosTable,
