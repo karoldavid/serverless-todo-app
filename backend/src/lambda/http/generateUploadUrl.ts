@@ -43,14 +43,11 @@ export const handler = middy(
 
     const todo = await getTodo(todoId, event)
 
-    // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
     const imageId = uuid.v4()
 
     await createImage(todoId, imageId, todo, event)
 
     const url = getUploadUrl(imageId)
-
-    await updateTodoUrl(todo, url, event)
 
     return {
       statusCode: 201,
@@ -77,16 +74,21 @@ async function createImage(
   // const newImage = JSON.parse(event.body)
   const userId = getUserId(event)
 
+  const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}`
+
   const newItem = {
     userId,
     todoId,
     imageId,
     timestamp,
     ...todo,
-    attachmentUrl: `https://${bucketName}.s3.amazonaws.com/${todoId}`
+    attachmentUrl
   }
-  console.log('Storing new item: ', newItem)
 
+  logger.info('Storing new item: ', newItem)
+
+  await updateTodoUrl(todoId, attachmentUrl, event)
+  
   await docClient
     .put({
       TableName: imagesTable,

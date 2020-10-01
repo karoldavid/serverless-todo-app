@@ -85,17 +85,27 @@ export class TodoAccess {
   }
 
   async updateTodoUrl(
-    todo: TodoItem,
+    userId: string,
+    todoId: string,
     attachmentUrl: string
-  ): Promise<TodoItem> {
+  ): Promise<string> {
     await this.docClient
-      .put({
+      .update({
         TableName: this.todosTable,
-        Item: { ...todo, attachmentUrl }
+        Key: {
+          todoId,
+          userId
+        },
+        ExpressionAttributeNames: { '#A': 'attachmentUrl' },
+        UpdateExpression: 'set #A = :attachmentUrl',
+        ExpressionAttributeValues: {
+          ':attachmentUrl': attachmentUrl
+        },
+        ReturnValues: 'UPDATED_NEW'
       })
       .promise()
 
-    return { ...todo, attachmentUrl }
+    return attachmentUrl
   }
 
   async deleteTodo(todoId: string, userId: string): Promise<string> {
