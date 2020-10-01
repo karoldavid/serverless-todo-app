@@ -56,7 +56,7 @@ export class Todos extends React.PureComponent<TodosProps, TodosState> {
         newTodoName: ''
       })
     } catch {
-      alert('Todo creation failed')
+      alert('Todo creation failed. Title must have 5 - 20 chars and can not contain whitespaces.')
     }
   }
 
